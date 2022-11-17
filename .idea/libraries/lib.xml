@@ -1,0 +1,34 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/exp4j-0.4.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/pdfbox-app-2.0.22.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/commons-csv-1.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/edtftpj.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/poi-ooxml-3.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/activation-1.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/ojdbc6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/commons-io-2.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/stock.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/xmlbeans-2.6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/vortex.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/log4j-core-2.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/flying-saucer-pdf-itext5-9.1.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jdatepicker.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/poi-3.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/log4j-api-2.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/freemarker-java8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/commons-collections4-4.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/swingx-all-1.6.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/TableLayout.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/mail-1.4.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/poi-ooxml-schemas-3.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/commons-email-1.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/commons-lang3-3.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/freemarker.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/controlsfx-jfx-13.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

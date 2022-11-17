@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="[DEV] SogicWebService:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/_DEV__SogicWebService_war_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="SogicWebService/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="SogicWebService" />
+          <element id="file-copy" path="$PROJECT_DIR$/config/dev/log4j2.xml" />
+          <element id="module-output" name="SogicCore" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="file-copy" path="$PROJECT_DIR$/lib/jstl-1.2.jar" />
+          <element id="library" level="project" name="lib" />
+          <element id="library" level="project" name="jasperreports" />
+          <element id="library" level="application" name="javafx" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

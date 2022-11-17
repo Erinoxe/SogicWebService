@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="jasperreports">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jasperreports/commons-digester-2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jasperreports/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jasperreports/jasperreports-functions-6.15.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jasperreports/barbecue-1.5-beta1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jasperreports/joda-time_2.9.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jasperreports/itext-2.1.7.js6-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jasperreports/org.apache.commons.collections_3.2.2.v201511171945.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../SERP/SogicCore/lib/jasperreports/jasperreports-6.15.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

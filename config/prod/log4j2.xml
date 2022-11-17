@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--PRODUCTION CONFIGURATION-->
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{dd/MM/yyyy HH:mm:ss} [%-5level][%logger{36}] %msg%n"/>
+        </Console>
+        <RollingFile name="LogFile" fileName="logs/sogic-webservice.log" immediateFlush="true" filePattern="logs/sogic-webservice-%d{MM-yyyy}-%i.log">
+            <PatternLayout pattern="%d{dd/MM/yyyy HH:mm:ss} [%-5level][%logger{36}] %msg%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <SMTP name="Mail" subject="Une erreur est survenue dans SogicWebService" to="sebastienparian@sogic.fr" from="SWS-system@serp.fr"
+              smtpHost="128.0.0.20" smtpPort="25" bufferSize="100" ignoreExceptions="false">
+            <CustomHtmlLayout />
+        </SMTP>
+        <Async name="AsyncMail">
+            <AppenderRef ref="Mail"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Logger name="fr.sogic" level="debug" additivity="false">
+            <AppenderRef ref="AsyncMail" level="trace"/>
+            <AppenderRef ref="LogFile"/>
+        </Logger>
+        <Root level="error">
+            <AppenderRef ref="LogFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

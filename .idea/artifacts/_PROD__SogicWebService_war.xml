@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="[PROD] SogicWebService:war">
+    <output-path>$PROJECT_DIR$/out/artifacts/_PROD__SogicWebService_war</output-path>
+    <root id="archive" name="[PROD] SogicWebService_war.war">
+      <element id="artifact" artifact-name="[PROD] SogicWebService:war exploded" />
+    </root>
+  </artifact>
+</component>

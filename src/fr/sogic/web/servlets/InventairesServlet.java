@@ -4,20 +4,17 @@ import fr.sogic.erp.core.entities.Article;
 import fr.sogic.erp.core.entities.Societe;
 import fr.sogic.erp.core.queries.ArticleQueries;
 import fr.sogic.erp.core.queries.DBManager;
-import fr.sogic.erp.core.queries.SocieteQueries;
+import fr.sogic.erp.core.queries.MouvementQueries;
 import fr.sogic.erp.core.services.ConfigService;
 import fr.sogic.utils.FileUtils;
-import fr.sogic.web.queries.InventaireQueries;
 import fr.sogic.web.utils.XmlUtils;
 import fr.sogic.utils.DateUtils;
-import fr.sogic.web.entities.Inventaire;
-import fr.sogic.web.entities.LigneInventaire;
+import fr.sogic.erp.core.entities.Inventaire;
+import fr.sogic.erp.core.entities.LigneInventaire;
 import fr.sogic.web.utils.ServletUtils;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +46,8 @@ import java.util.stream.Stream;
 @WebServlet(urlPatterns = {"/inventaires"})
 public class InventairesServlet extends HttpServlet {
 
-    @Resource(name = "jdbc/televenteDB")
+//    @Resource(name = "jdbc/televenteDB")
+    @Resource(name = "jdbc/televenteDB2")
     private DataSource dataSource;
 
     protected static final Logger logger = LogManager.getLogger();
@@ -79,8 +77,9 @@ public class InventairesServlet extends HttpServlet {
         if(nodeList.getLength() == 0) {
             Inventaire inventaire = new Inventaire();
             //inventaire.setBordereau(Integer.parseInt(nodeList.item(0).getTextContent()));
-            inventaire.setCodeSociete(societe);
-            inventaire.setCommentaire(document.getElementsByTagName("Commentaire").item(0).getTextContent());
+            inventaire.setCodeDepot(societe);
+            inventaire.setCodeSociete(Societe.SEDACO);
+            inventaire.setRefClient(document.getElementsByTagName("Commentaire").item(0).getTextContent());
             inventaire.setCodePreparateur(document.getElementsByTagName("Responsable").item(0).getTextContent());
             inventaire.setDateBordereau(DateUtils.parse(document.getElementsByTagName("Date").item(0).getTextContent(), "yyyy-MM-dd"));
 
@@ -89,7 +88,9 @@ public class InventairesServlet extends HttpServlet {
             for(int i=0; i<nodeLignes.getLength(); i++) {
                 Element ligne = (Element) nodeLignes.item(i);
                 Article article = ArticleQueries.selectArticle(ligne.getElementsByTagName("Article").item(0).getTextContent(), societe);
-                LigneInventaire inventaireLigne = new LigneInventaire(article, Double.parseDouble(ligne.getElementsByTagName("Qte").item(0).getTextContent().replace(",",".")));
+                LigneInventaire inventaireLigne = new LigneInventaire();
+                inventaireLigne.setArticle(article);
+                inventaireLigne.setQteUVLivrees(Double.parseDouble(ligne.getElementsByTagName("Qte").item(0).getTextContent().replace(",",".")));
                 inventaireLigne.setInventaire(inventaire);
                 inventaireLigne.setNumLigne(inventaire.getNumLigneMax()+1);
                 String dlcString = ligne.getElementsByTagName("Dlc").item(0).getTextContent();
@@ -101,7 +102,7 @@ public class InventairesServlet extends HttpServlet {
             inventaire.computeTotalHtLiv();
             inventaire.computePoidsLivr();
 
-            InventaireQueries.insertInventaire(inventaire);
+            MouvementQueries.insertMouvement(inventaire);
 
             Node bordereau = document.createElement("Bordereau");
             bordereau.appendChild(document.createTextNode(inventaire.getNumBordereau()+""));
@@ -133,9 +134,9 @@ public class InventairesServlet extends HttpServlet {
             // En général, prendre n'importe quelle société de la liste devrait donner la même imprimante, mais il y a tout de même un cas où cela
             // s'avère faux : lorsqu'il y a du GEL GMS dans la commande, qui sont des produits SEDAGEL préparés à KALLIGEL. Pour sécuriser ces cas,
             // on utilise donc d'office l'imprimante de POYET lorsque des commandes POYET ou KALLIGEL se trouvent dans le roll.
-            imprimante = ConfigService.getPropertyForSociete("PRINTER_DEFAULT_DEPOT", societes.get(0));
+            imprimante = ConfigService.getPropertyForDepot("PRINTER_DEFAULT_DEPOT", societes.get(0));
             if (societes.contains(Societe.POYET) || societes.contains(Societe.KALLIGEL))
-                imprimante = ConfigService.getPropertyForSociete("PRINTER_DEFAULT_DEPOT", Societe.POYET);
+                imprimante = ConfigService.getPropertyForDepot("PRINTER_DEFAULT_DEPOT", Societe.POYET);
         }
         Document document = XmlUtils.createDocument();
         // root element

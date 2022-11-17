@@ -30,7 +30,8 @@ import java.util.List;
 @WebServlet(urlPatterns = {"/prepa"})
 public class ControlePrepaServlet extends HttpServlet {
 
-    @Resource(name = "jdbc/televenteDB")
+//    @Resource(name = "jdbc/televenteDB")
+    @Resource(name = "jdbc/televenteDB2")
     private DataSource dataSource;
 
     private static final Logger logger = LogManager.getLogger();
@@ -72,35 +73,35 @@ public class ControlePrepaServlet extends HttpServlet {
     public void getPreparation(HttpServletRequest request, HttpServletResponse response) throws ParserConfigurationException, TransformerException, IOException {
         try {
             Integer preparation = Integer.parseInt(ServletUtils.getMandatoryParameter(request, "preparation"));
-            List<Commande> preparationCommandes = CommandeQueries.selectCommandesForPreparation(preparation);
-            if(!preparationCommandes.isEmpty()) {
+            List<Vente> preparationVentes = VenteQueries.selectVentesForPreparation(preparation);
+            if(!preparationVentes.isEmpty()) {
                 Document document = XmlUtils.createDocument();
                 Element root = document.createElement("Ventes");
                 document.appendChild(root);
-                preparationCommandes.forEach(commande -> {
-                    commande.setLignes(FXCollections.observableArrayList(CommandeQueries.selectLignesCommande(commande)));
-                    Element domCommande = document.createElement("Vente");
-                    domCommande.setAttribute("bordereau", String.valueOf(commande.getNumBordereau()));
-                    domCommande.setAttribute("depot", String.valueOf(commande.getCodeSociete()));
-                    domCommande.setAttribute("typeMouv", commande.getTypeMouvement().getLetter());
-                    root.appendChild(domCommande);
+                preparationVentes.forEach(vente -> {
+                    vente.setLignes(FXCollections.observableArrayList(VenteQueries.selectLignesVente(vente)));
+                    Element domVente = document.createElement("Vente");
+                    domVente.setAttribute("bordereau", String.valueOf(vente.getNumBordereau()));
+                    domVente.setAttribute("depot", String.valueOf(vente.getCodeSociete()));
+                    domVente.setAttribute("typeMouv", vente.getTypeMouvement().getLetter());
+                    root.appendChild(domVente);
 
                     Element domLignes = document.createElement("Lignes");
-                    domCommande.appendChild(domLignes);
-                    commande.getLignesCommande().forEach(ligneCommande -> {
+                    domVente.appendChild(domLignes);
+                    vente.getLignesVente().forEach(ligneVente -> {
                         Element domLigne = document.createElement("Ligne");
                         domLignes.appendChild(domLigne);
                         Element domNumLigne = document.createElement("Numero");
-                        domNumLigne.appendChild(document.createTextNode(String.valueOf(ligneCommande.getNumLigne())));
+                        domNumLigne.appendChild(document.createTextNode(String.valueOf(ligneVente.getNumLigne())));
                         domLigne.appendChild(domNumLigne);
                         Element domArticle = document.createElement("Article");
-                        domArticle.appendChild(document.createTextNode(String.valueOf(ligneCommande.getArticle().getCodeProduit())));
+                        domArticle.appendChild(document.createTextNode(String.valueOf(ligneVente.getArticle().getCodeProduit())));
                         domLigne.appendChild(domArticle);
                         Element domQte = document.createElement("Quantite");
-                        domQte.appendChild(document.createTextNode(String.valueOf(ligneCommande.getQteUVLivrees())));
+                        domQte.appendChild(document.createTextNode(String.valueOf(ligneVente.getQteUVLivrees())));
                         domLigne.appendChild(domQte);
                         Element domNc = document.createElement("NCPrepa");
-                        domNc.appendChild(document.createTextNode(ligneCommande.getCodeNCPrepa() != null ? String.valueOf(ligneCommande.getCodeNCPrepa().getCode()) : ""));
+                        domNc.appendChild(document.createTextNode(ligneVente.getCodeNCPrepa() != null ? String.valueOf(ligneVente.getCodeNCPrepa().getCode()) : ""));
                         domLigne.appendChild(domNc);
                     });
                 });
@@ -153,11 +154,11 @@ public class ControlePrepaServlet extends HttpServlet {
         NodeList venteNodes = document.getElementsByTagName("Vente");
         for(int i=0; i<venteNodes.getLength(); i++) {
             Element commandeElement = (Element) venteNodes.item(i);
-            Commande commande = new Commande();
+            Vente commande = new Vente();
             commande.setNumBordereau(Integer.parseInt(commandeElement.getAttribute("bordereau")));
             commande.setCodeSociete(Integer.parseInt(commandeElement.getAttribute("depot")));
-            CommandeQueries.selectCommandeInto(commande);
-            commande.setLignes(FXCollections.observableArrayList(CommandeQueries.selectLignesCommande(commande)));
+            VenteQueries.selectVenteInto(commande);
+            commande.setLignes(FXCollections.observableArrayList(VenteQueries.selectLignesVente(commande)));
             if(controleur.getId() != commande.getIdControleur()) {
                 commande.setIdControleur(controleur.getId());
                 MouvementQueries.updateMouvement(commande);
@@ -166,22 +167,22 @@ public class ControlePrepaServlet extends HttpServlet {
             for(int j=0; j<ligneNodes.getLength(); j++) {
                 Element ligne = (Element) ligneNodes.item(j);
                 int numLigne = Integer.parseInt(ligne.getElementsByTagName("Numero").item(0).getTextContent());
-                LigneCommande ligneCommande = commande.getLignesCommande().stream().filter(line -> line.getNumLigne() == numLigne).findFirst().orElse(null);
-                if(ligneCommande != null) {
+                LigneVente ligneVente = commande.getLignesVente().stream().filter(line -> line.getNumLigne() == numLigne).findFirst().orElse(null);
+                if(ligneVente != null) {
                     if (ligne.getElementsByTagName("NCPrepa").getLength() != 0) {
                         String code = ligne.getElementsByTagName("NCPrepa").item(0).getTextContent();
                         CodeNC codeNCPrepa = CodeNC.getFromCode(code);
-                        if(codeNCPrepa != null && !codeNCPrepa.equals(ligneCommande.getCodeNCPrepa())) {
-                            ligneCommande.setCodeNCPrepa(codeNCPrepa);
-                            MouvementQueries.updateLigneMouvement(ligneCommande);
+                        if(codeNCPrepa != null && !codeNCPrepa.equals(ligneVente.getCodeNCPrepa())) {
+                            ligneVente.setCodeNCPrepa(codeNCPrepa);
+                            MouvementQueries.updateLigneMouvement(ligneVente);
                         } else if (codeNCPrepa == null) {
                             logger.error("[updatePreparation] Impossible de trouver un code NC correspondant à " + code);
                             response.setStatus(400);
                             return;
                         }
-                    } else if (ligneCommande.getCodeNCPrepa() != null) {
-                        ligneCommande.setCodeNCPrepa(null);
-                        MouvementQueries.updateLigneMouvement(ligneCommande);
+                    } else if (ligneVente.getCodeNCPrepa() != null) {
+                        ligneVente.setCodeNCPrepa(null);
+                        MouvementQueries.updateLigneMouvement(ligneVente);
                     }
                 } else {
                     logger.error("[updatePreparation] Impossible de trouver une ligne portant le numéro " + numLigne +" dans la commande " + commande);

@@ -26,5 +26,6 @@
     <orderEntry type="library" exported="" name="lib" level="project" />
     <orderEntry type="library" exported="" name="jasperreports" level="project" />
     <orderEntry type="library" exported="" name="javafx" level="application" />
+    <orderEntry type="library" name="javafx18" level="application" />
   </component>
 </module>

@@ -30,7 +30,8 @@ import java.util.List;
 @WebServlet(urlPatterns = {"/*"})
 public class CommonServlet extends HttpServlet {
 
-    @Resource(name = "jdbc/televenteDB")
+//    @Resource(name = "jdbc/televenteDB")
+    @Resource(name = "jdbc/televenteDB2")
     private DataSource dataSource;
 
     static final Logger logger = LogManager.getLogger();
@@ -149,7 +150,7 @@ public class CommonServlet extends HttpServlet {
 
                 Element qte = document.createElement("Qte");
                 domArticle.appendChild(qte);
-                Double stockPhysique = (Double)ArticleQueries.getStock(article.getCodeSociete(), article.getCodeProduit(), LocalDate.now(), LocalDate.now()).get(1);
+                Double stockPhysique = (Double)ArticleQueries.getStock(article.getCodeDepot(), article.getCodeProduit(), LocalDate.now(), LocalDate.now()).get(1);
                 qte.appendChild(document.createTextNode(String.valueOf(stockPhysique)));
 
                 Element emplacement = document.createElement("Emplacement");
@@ -164,11 +165,11 @@ public class CommonServlet extends HttpServlet {
         try {
             int numBordereau = Integer.parseInt(request.getParameter("commande"));
             Document document = XmlUtils.createDocument();
-            Commande commande = new Commande();
-            commande.setCodeSociete(societe);
-            commande.setNumBordereau(numBordereau);
-            CommandeQueries.selectCommandeInto(commande);
-            Fille client = commande.getFille();
+            Vente vente = new Vente();
+            vente.setCodeDepot(societe);
+            vente.setNumBordereau(numBordereau);
+            VenteQueries.selectVenteInto(vente);
+            Fille client = vente.getFille();
             if (client != null) {
                 // root element
                 Element root = document.createElement("Client");

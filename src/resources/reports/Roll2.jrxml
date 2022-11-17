@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.15.0.final using JasperReports Library version 6.15.0-dd49bfb94918336b8321d5507193f0169ead4e95  -->
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Roll" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" whenResourceMissingType="Error" uuid="2866f965-66bf-4505-a259-43c4b2c171d7">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="OracleProd.xml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="OracleDev2021.xml"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="246"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="749"/>
 	<property name="net.sf.jasperreports.print.create.bookmarks" value="true"/>
@@ -37,11 +37,11 @@
 		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="BDD"/>
 		<queryString language="SQL">
-			<![CDATA[SELECT reserve.code as reserve,article.emplacement as picking, article.code as article, article.libelle, article_reserve.dlc , article_reserve.date_reception, article_reserve.colis, TELEVENTE.pk_module_stock.getStock(article.societe, article.code, SYSDATE,SYSDATE) as Qte, article.uv_pcb as pcb
+			<![CDATA[SELECT reserve.code as reserve,article.emplacement as picking, article.code as article, article.libelle, article_reserve.dlc , article_reserve.date_reception, article_reserve.colis, TELEVENTE.pk_module_stock.getStock(article.depot, article.code, SYSDATE,SYSDATE) as Qte, article.uv_pcb as pcb
 FROM serp.reserve
     LEFT JOIN serp.article_reserve ON reserve.id = article_reserve.id_reserve
-    LEFT JOIN televente.article ON article.code = article_reserve.code_article AND article.societe = reserve.societe
-WHERE reserve.societe = 13 AND reserve.picking = 'N'
+    LEFT JOIN televente.article ON article.code = article_reserve.code_article AND article.depot = reserve.depot
+WHERE reserve.depot = 13 AND reserve.picking = 'N'
 ORDER BY reserve.code]]>
 		</queryString>
 		<field name="RESERVE" class="java.lang.String">
@@ -75,26 +75,26 @@ ORDER BY reserve.code]]>
 	<parameter name="NUMEROS" class="java.lang.String" nestedType=""/>
 	<queryString language="SQL">
 		<![CDATA[SELECT tournee.code, 
-LISTAGG(societe.libelle, ', ') within group (order by societe.id) as societes,
+LISTAGG(depot.libelle, ', ') within group (order by depot.id) as depots,
 decode(mouvement."RAISONSOC", null, mere."NOMUSUEL", mouvement."NOMUSUEL") as NOMUSUEL,
 decode(mouvement."RAISONSOC", null, mere.CP, mouvement."CP") as CP,
 decode(mouvement."RAISONSOC", null, mere.VILLE, mouvement."VILLE") as VILLE,
 mere.tel, 
 mouvement.date_liv, mouvement.rang,
 sum(
-case when decode(m2.societe,2,'F',3,'G',13,'C',80,'P',84,'K') || TO_CHAR(m2.bordereau) IN ($P!{NUMEROS}) then 1
+case when decode(m2.depot,2,'F',3,'G',13,'C',80,'P',84,'K') || TO_CHAR(m2.bordereau) IN ($P!{NUMEROS}) then 1
     else 0
 end) as nb_com_scan, 
 count(m2.bordereau) as nb_com
 FROM televente.mouvement 
-LEFT JOIN televente.fille ON fille.code = mouvement.fille AND fille.societe = mouvement.societe
-INNER JOIN televente.mouvement m2 ON m2.fille = mouvement.fille and m2.societe = mouvement.societe AND m2.date_liv = mouvement.date_liv and m2.tournee = mouvement.tournee
+LEFT JOIN televente.fille ON fille.code = mouvement.tiers AND fille.depot = mouvement.depot
+INNER JOIN televente.mouvement m2 ON m2.tiers = mouvement.tiers and m2.depot = mouvement.depot AND m2.date_liv = mouvement.date_liv and m2.tournee = mouvement.tournee
 LEFT JOIN televente.mere ON mere.code = fille.mere
 LEFT JOIN televente.tournee ON mouvement.tournee = tournee.code
-LEFT JOIN televente.societe ON societe.id=m2.societe
+LEFT JOIN televente.depot ON depot.id=m2.depot
 WHERE 
     mouvement.type_mouv = 'V' 
-    AND decode(m2.societe,2,'F',3,'G',13,'C',80,'P',84,'K') || TO_CHAR(mouvement.bordereau) IN ($P!{NUMEROS})
+    AND decode(m2.depot,2,'F',3,'G',13,'C',80,'P',84,'K') || TO_CHAR(mouvement.bordereau) IN ($P!{NUMEROS})
 GROUP BY tournee.code, mouvement.raisonsoc, mouvement.nomusuel, mere.nomusuel, mere.cp, mere.ville, mouvement.cp, mouvement.ville, mere.tel, mouvement.date_liv, mouvement.rang
 ORDER BY mouvement.rang]]>
 	</queryString>
@@ -102,9 +102,9 @@ ORDER BY mouvement.rang]]>
 		<property name="com.jaspersoft.studio.field.name" value="CODE"/>
 		<property name="com.jaspersoft.studio.field.label" value="CODE"/>
 	</field>
-	<field name="SOCIETES" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="SOCIETES"/>
-		<property name="com.jaspersoft.studio.field.label" value="SOCIETES"/>
+	<field name="DEPOTS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPOTS"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPOTS"/>
 	</field>
 	<field name="NOMUSUEL" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="NOMUSUEL"/>
@@ -164,8 +164,7 @@ ORDER BY mouvement.rang]]>
 					<textElement textAlignment="Left">
 						<font fontName="SansSerif" size="10" isBold="false"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{SOCIETES}
-]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{DEPOTS}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="0" y="55" width="306" height="19" forecolor="#000000" uuid="bf1ea272-0ea4-4a13-972d-bf1ab343fff7"/>
@@ -235,7 +234,7 @@ ORDER BY mouvement.rang]]>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="10" isBold="false"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{SOCIETES}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{DEPOTS}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
 					<reportElement x="463" y="0" width="92" height="79" uuid="8f30098b-26e9-4813-b559-adbe3d6e8b4e">

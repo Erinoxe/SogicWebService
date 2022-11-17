@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<jdbcDataAdapter class="net.sf.jasperreports.data.jdbc.JdbcDataAdapterImpl"><name>OracleDev2021</name><driver>oracle.jdbc.driver.OracleDriver</driver><username>system</username><password>manager</password><savePassword>true</savePassword><url>jdbc:oracle:thin:@128.0.0.33:1521:orcl</url><database></database><serverAddress></serverAddress><classpath>E:\lib\ojdbc6.jar</classpath></jdbcDataAdapter>

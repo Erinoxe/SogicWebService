@@ -161,12 +161,12 @@ public class CommonServlet extends HttpServlet {
     }
 
     public void getFilleForCommande(HttpServletRequest request, HttpServletResponse response) throws ParserConfigurationException, TransformerException, IOException {
-        int societe = Integer.parseInt(request.getParameter("societe"));
+        int depot = Integer.parseInt(request.getParameter("societe"));
         try {
             int numBordereau = Integer.parseInt(request.getParameter("commande"));
             Document document = XmlUtils.createDocument();
             Vente vente = new Vente();
-            vente.setCodeDepot(societe);
+            vente.setCodeDepot(depot);
             vente.setNumBordereau(numBordereau);
             VenteQueries.selectVenteInto(vente);
             Fille client = vente.getFille();

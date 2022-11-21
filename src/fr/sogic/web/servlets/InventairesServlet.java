@@ -6,6 +6,7 @@ import fr.sogic.erp.core.queries.ArticleQueries;
 import fr.sogic.erp.core.queries.DBManager;
 import fr.sogic.erp.core.queries.MouvementQueries;
 import fr.sogic.erp.core.services.ConfigService;
+import fr.sogic.erp.core.services.MouvementService;
 import fr.sogic.utils.FileUtils;
 import fr.sogic.web.utils.XmlUtils;
 import fr.sogic.utils.DateUtils;
@@ -68,16 +69,17 @@ public class InventairesServlet extends HttpServlet {
     public void addLineInventaire(HttpServletRequest request, HttpServletResponse response) throws ParserConfigurationException, IOException, SAXException, SQLException, TransformerException {
         int societe = Integer.parseInt(request.getParameter("societe"));
 
-        DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
-        DocumentBuilder constructeur = fabrique.newDocumentBuilder();
-
-        Document document = constructeur.parse(request.getInputStream());
+        Document document =  DocumentBuilderFactory
+                .newInstance()
+                .newDocumentBuilder()
+                .parse(request.getInputStream());
 
         NodeList nodeList = document.getElementsByTagName("Bordereau");
         if(nodeList.getLength() == 0) {
             Inventaire inventaire = new Inventaire();
-            //inventaire.setBordereau(Integer.parseInt(nodeList.item(0).getTextContent()));
             inventaire.setCodeDepot(societe);
+            // TODO : Ou récupérer le N° de bordereau ?
+            inventaire.setNumBordereau(MouvementService.generateNumeroBordereau(societe, MouvementService.TypeCompteur.INVENTAIRE));
             inventaire.setCodeSociete(Societe.SEDACO);
             inventaire.setRefClient(document.getElementsByTagName("Commentaire").item(0).getTextContent());
             inventaire.setCodePreparateur(document.getElementsByTagName("Responsable").item(0).getTextContent());
@@ -103,6 +105,7 @@ public class InventairesServlet extends HttpServlet {
             inventaire.computePoidsLivr();
 
             MouvementQueries.insertMouvement(inventaire);
+            // TODO : Insertion des lignes ?
 
             Node bordereau = document.createElement("Bordereau");
             bordereau.appendChild(document.createTextNode(inventaire.getNumBordereau()+""));
@@ -130,7 +133,7 @@ public class InventairesServlet extends HttpServlet {
             // Pour cela on inspecte les lettres préfixes des bordereaux et on en déduit la liste des dépots
             List<Integer> societes = commandes.stream().map(bordereau ->
                             Societe.getValues().stream().filter(societe -> societe.getLettre().equals(bordereau.substring(0, 1))).findFirst().get().getId())
-                    .distinct().collect(Collectors.toList());
+                    .distinct().toList();
             // En général, prendre n'importe quelle société de la liste devrait donner la même imprimante, mais il y a tout de même un cas où cela
             // s'avère faux : lorsqu'il y a du GEL GMS dans la commande, qui sont des produits SEDAGEL préparés à KALLIGEL. Pour sécuriser ces cas,
             // on utilise donc d'office l'imprimante de POYET lorsque des commandes POYET ou KALLIGEL se trouvent dans le roll.

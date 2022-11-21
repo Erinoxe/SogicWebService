@@ -82,7 +82,7 @@ public class ControlePrepaServlet extends HttpServlet {
                     vente.setLignes(FXCollections.observableArrayList(VenteQueries.selectLignesVente(vente)));
                     Element domVente = document.createElement("Vente");
                     domVente.setAttribute("bordereau", String.valueOf(vente.getNumBordereau()));
-                    domVente.setAttribute("depot", String.valueOf(vente.getCodeSociete()));
+                    domVente.setAttribute("depot", String.valueOf(vente.getCodeDepot()));
                     domVente.setAttribute("typeMouv", vente.getTypeMouvement().getLetter());
                     root.appendChild(domVente);
 
@@ -154,20 +154,20 @@ public class ControlePrepaServlet extends HttpServlet {
         NodeList venteNodes = document.getElementsByTagName("Vente");
         for(int i=0; i<venteNodes.getLength(); i++) {
             Element commandeElement = (Element) venteNodes.item(i);
-            Vente commande = new Vente();
-            commande.setNumBordereau(Integer.parseInt(commandeElement.getAttribute("bordereau")));
-            commande.setCodeSociete(Integer.parseInt(commandeElement.getAttribute("depot")));
-            VenteQueries.selectVenteInto(commande);
-            commande.setLignes(FXCollections.observableArrayList(VenteQueries.selectLignesVente(commande)));
-            if(controleur.getId() != commande.getIdControleur()) {
-                commande.setIdControleur(controleur.getId());
-                MouvementQueries.updateMouvement(commande);
+            Vente vente = new Vente();
+            vente.setNumBordereau(Integer.parseInt(commandeElement.getAttribute("bordereau")));
+            vente.setCodeDepot(Integer.parseInt(commandeElement.getAttribute("depot")));
+            VenteQueries.selectVenteInto(vente);
+            vente.setLignes(FXCollections.observableArrayList(VenteQueries.selectLignesVente(vente)));
+            if(controleur.getId() != vente.getIdControleur()) {
+                vente.setIdControleur(controleur.getId());
+                MouvementQueries.updateMouvement(vente);
             }
             NodeList ligneNodes = commandeElement.getElementsByTagName("Ligne");
             for(int j=0; j<ligneNodes.getLength(); j++) {
                 Element ligne = (Element) ligneNodes.item(j);
                 int numLigne = Integer.parseInt(ligne.getElementsByTagName("Numero").item(0).getTextContent());
-                LigneVente ligneVente = commande.getLignesVente().stream().filter(line -> line.getNumLigne() == numLigne).findFirst().orElse(null);
+                LigneVente ligneVente = vente.getLignesVente().stream().filter(line -> line.getNumLigne() == numLigne).findFirst().orElse(null);
                 if(ligneVente != null) {
                     if (ligne.getElementsByTagName("NCPrepa").getLength() != 0) {
                         String code = ligne.getElementsByTagName("NCPrepa").item(0).getTextContent();
@@ -185,7 +185,7 @@ public class ControlePrepaServlet extends HttpServlet {
                         MouvementQueries.updateLigneMouvement(ligneVente);
                     }
                 } else {
-                    logger.error("[updatePreparation] Impossible de trouver une ligne portant le numéro " + numLigne +" dans la commande " + commande);
+                    logger.error("[updatePreparation] Impossible de trouver une ligne portant le numéro " + numLigne +" dans la commande " + vente);
                     response.setStatus(400);
                     return;
                 }

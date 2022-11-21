@@ -75,15 +75,20 @@ public class InventairesServlet extends HttpServlet {
                 .parse(request.getInputStream());
 
         NodeList nodeList = document.getElementsByTagName("Bordereau");
+        // TODO éventuel : passer le n° de bordereau en attribuit du tag Bordereau pour une mise à jour plutôt qu'une création ?
         if(nodeList.getLength() == 0) {
             Inventaire inventaire = new Inventaire();
             inventaire.setCodeDepot(societe);
-            // TODO : Ou récupérer le N° de bordereau ?
             inventaire.setNumBordereau(MouvementService.generateNumeroBordereau(societe, MouvementService.TypeCompteur.INVENTAIRE));
             inventaire.setCodeSociete(Societe.SEDACO);
+            inventaire.setCodeTiers("$000");
+            inventaire.setCodeFilleFac("0000");
             inventaire.setRefClient(document.getElementsByTagName("Commentaire").item(0).getTextContent());
             inventaire.setCodePreparateur(document.getElementsByTagName("Responsable").item(0).getTextContent());
             inventaire.setDateBordereau(DateUtils.parse(document.getElementsByTagName("Date").item(0).getTextContent(), "yyyy-MM-dd"));
+            inventaire.setDateLivraison(inventaire.getDateBordereau());
+            inventaire.setDateES(inventaire.getDateBordereau());
+            inventaire.setEtatInventaire(Inventaire.EtatInventaire.SAISIE_PDA);
 
             // Add lines
             NodeList nodeLignes = document.getElementsByTagName("Ligne");
@@ -99,13 +104,19 @@ public class InventairesServlet extends HttpServlet {
                 if(!StringUtils.isEmpty(dlcString) && !"null".equalsIgnoreCase(dlcString))
                     inventaireLigne.setDlc(DateUtils.parse(dlcString, "yyyy-MM-dd"));
                 inventaireLigne.setPuHt(ArticleQueries.selectTarifNetNet(article, inventaire.getDateBordereau()));
+                inventaireLigne.setTarifClient(inventaireLigne.getPuHt());
+                inventaireLigne.setTarifGeneral(inventaireLigne.getPuHt());
+                inventaireLigne.setPrixNet(inventaireLigne.getPuHt());
+                inventaireLigne.setPrixAchat(inventaireLigne.getPuHt());
+                inventaireLigne.setPrixBase(inventaireLigne.getPuHt());
                 inventaire.addLigne(inventaireLigne);
             }
             inventaire.computeTotalHtLiv();
             inventaire.computePoidsLivr();
 
-            MouvementQueries.insertMouvement(inventaire);
-            // TODO : Insertion des lignes ?
+            MouvementQueries.insertMouvement(inventaire); // Insertion d'office car la mise à jour de bordereau existant n'est pas supporté pour l'instant
+            for (LigneInventaire ligneInventaire : inventaire.getLignesInventaire())
+                MouvementQueries.insertLigneMouvement(ligneInventaire);
 
             Node bordereau = document.createElement("Bordereau");
             bordereau.appendChild(document.createTextNode(inventaire.getNumBordereau()+""));

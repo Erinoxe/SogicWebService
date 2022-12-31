@@ -47,8 +47,7 @@ import java.util.stream.Stream;
 @WebServlet(urlPatterns = {"/inventaires"})
 public class InventairesServlet extends HttpServlet {
 
-//    @Resource(name = "jdbc/televenteDB")
-    @Resource(name = "jdbc/televenteDB2")
+    @Resource(name = "jdbc/televenteDB")
     private DataSource dataSource;
 
     protected static final Logger logger = LogManager.getLogger();
@@ -75,7 +74,7 @@ public class InventairesServlet extends HttpServlet {
                 .parse(request.getInputStream());
 
         NodeList nodeList = document.getElementsByTagName("Bordereau");
-        // TODO éventuel : passer le n° de bordereau en attribuit du tag Bordereau pour une mise à jour plutôt qu'une création ?
+        // TODO éventuel : passer le n° de bordereau en attribut du tag Bordereau pour une mise à jour plutôt qu'une création ?
         if(nodeList.getLength() == 0) {
             Inventaire inventaire = new Inventaire();
             inventaire.setCodeDepot(societe);

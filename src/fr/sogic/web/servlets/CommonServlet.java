@@ -30,8 +30,7 @@ import java.util.List;
 @WebServlet(urlPatterns = {"/*"})
 public class CommonServlet extends HttpServlet {
 
-//    @Resource(name = "jdbc/televenteDB")
-    @Resource(name = "jdbc/televenteDB2")
+    @Resource(name = "jdbc/televenteDB")
     private DataSource dataSource;
 
     static final Logger logger = LogManager.getLogger();
@@ -117,7 +116,7 @@ public class CommonServlet extends HttpServlet {
         String emplacementFin = request.getParameter("emplacement_fin").trim();
         Document document = XmlUtils.createDocument();
         List<Article> articles = ArticleQueries.selectArticles(CollectionUtils.toMap(
-                "societeFilter",  societe,
+                "depotFilter",  societe,
                 "emplacementStart", emplacementDebut,
                 "emplacementEnd", emplacementFin,
                 "ctr4ExcludeFilter", "'AD', 'AP', 'AH', 'AS', 'AG'"

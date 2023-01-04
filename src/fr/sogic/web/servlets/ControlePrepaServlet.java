@@ -30,8 +30,7 @@ import java.util.List;
 @WebServlet(urlPatterns = {"/prepa"})
 public class ControlePrepaServlet extends HttpServlet {
 
-//    @Resource(name = "jdbc/televenteDB")
-    @Resource(name = "jdbc/televenteDB2")
+    @Resource(name = "jdbc/televenteDB")
     private DataSource dataSource;
 
     private static final Logger logger = LogManager.getLogger();
